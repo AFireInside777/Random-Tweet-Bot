@@ -1,21 +1,80 @@
-from twitter import *
-from VideoGameTriviaDict import y
+import sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from sqlalchemy.sql import func
+import pymysql
 import random
+from twitter import *
 import time
 
+conn = #Database URL
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = "bx0eKxecxd2xfaxb8x89x8bDel" #For use with sessions and cookies
+app.config["SQLALCHEMY_DATABASE_URI"] = conn
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
 api = Twitter(auth=OAuth(
-token='1286447442775375877-e9G29sxXrcs9jYy9C2xU9aSMjfQmXK', 
-token_secret='YUKpi1ANnEaorCKPy6gCBnnDl2BD6rD7c2KbNrREjWRWB', 
-consumer_key='nlOEoIMsqpEhJeVMNdUqiYs3N',
-consumer_secret='LVW33fXTBeI1mLZXDvJgIxl30JmxHZa9kqOzx3HdY4Nmt4zlu8'
+token='APIKey',
+token_secret='APIKeySecret', 
+consumer_key='BearerToken', 
+consumer_secret='AccessTokenandSecret' 
 ))
 
-y_list = [*range(1, 20)]
+class TriviaFacts(db.Model):
+    id = db.Column(db.Integer, autoincrement = True, primary_key = True)
+    triviafact = db.Column(db.String(2500))
 
-random.shuffle(y_list)
+    def __init__(self, triviaobject):
+        self.triviafact = triviaobject
 
-for i in range(20):
-    key = y_list[i]
-    tweet = y[key]
+engine = sqlalchemy.create_engine(conn)
+
+meta_data = sqlalchemy.MetaData(bind=engine)
+
+sqlalchemy.MetaData.reflect(meta_data)
+
+trivia_table = meta_data.tables['trivia_facts']
+
+result = sqlalchemy.select([sqlalchemy.func.count()]).select_from(trivia_table).scalar()
+
+
+def gettriv(theid):
+    s = trivia_table.select().where(trivia_table.c.id==theid)
+    engineconnect = engine.connect()
+    newresult = engineconnect.execute(s)
+
+    for triv in newresult:
+        finalresult = triv[1]
+    return finalresult
+
+def posttweet():
+    idselect = random.randrange(0, result)
+    tweet = gettriv(idselect)
     newstatus = api.statuses.update(status=tweet)
-    time.sleep(60)
+
+posttweet()
+
+
+# @app.route("/gamingtriv")
+# def getgaming():
+#     gaminglist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+#     21, 23, 24, 25, 26, 27, 30, 32, 33, 34, 35, 36, 37, 38, 40, 42, 43, 44, 45, 48, 50, 
+#     51, 54, 55, 56, 57, 58, 59, 60, 61]
+#     selecttriv2 = gettriv(random.choice(gaminglist))
+#     return selecttriv2
+
+# @app.route("/techtriv")
+# def gettech():
+#     techlist = [22, 28, 29, 31, 32, 39, 41, 46, 47, 49,
+#     52, 53, 64, 69, 76, 77, 78, 79, 86, 88,
+#     92, 93, 94, 95, 96, 97, 98, 99, 100, 101,
+#     102, 104, 108, 109, 110, 111, 112, 116, 118, 119,
+#     121, 125, 132, 133, 134, 135, 136, 137, 138, 141]
+#     selecttriv3 = gettriv(random.choice(techlist))
+#     return selecttriv3
+
+#db.create_all()
+#db.session.commit()
+
