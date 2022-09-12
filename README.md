@@ -3,7 +3,16 @@ This is a program which randomly selects an entry from a MySQL database and send
 
 In my particular case, I was using it to post trivia facts about technology and gaming randomly to a Twitter account.
 
+#Dependencies
 You will need a Database that can connect to your program. In this case, I was using MySQL with this Python program.
+
+Modules:
+
+SQLalchemy: https://pypi.org/project/SQLAlchemy/
+Flask: https://pypi.org/project/Flask/
+Flask_sqlalchemy: https://pypi.org/project/Flask-SQLAlchemy/
+Twitter: https://pypi.org/project/twitter/
+
 
 You will also need Keys and Tokens from a Twitter Dev Account, which you can sign up for here: https://developer.twitter.com/en.
 
